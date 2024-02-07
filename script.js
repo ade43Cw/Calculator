@@ -21,11 +21,9 @@ function appendToDisplay(value) {
     }
 }
 
-
 function clearDisplay() {
     document.getElementById("tampil").value = "";
 }
-
 
 function clearToDisplay() {
     let input = document.getElementById("tampil").value;
@@ -33,13 +31,33 @@ function clearToDisplay() {
 }
 
 
-function TambahKurang() {
+let toggleCount = 0; // variabel untuk melacak jumlah klik
+
+function toggleNegative() {
     let input = document.getElementById("tampil").value;
 
-    // Memeriksa apakah input adalah angka
-    if (!isNaN(input) && input !== '') {
-        // Mengubah input menjadi nilai negatif
-        document.getElementById("tampil").value = "(" +(parseFloat(input) * -1) + ")";
+    // Menggunakan ekspresi reguler untuk mencari angka terakhir dalam input
+    let lastNumberMatch = input.match(/[-+*/]?(\d+(\.\d+)?)(?!.*\d)/);
+
+    if (lastNumberMatch) {
+        // Mengambil angka terakhir dari input
+        let lastNumber = lastNumberMatch[1];
+
+        if (toggleCount % 2 === 0) {
+            // Jika jumlah klik genap, angka menjadi positif
+            input = input.replace(/([-+*/]?\d+(\.\d+)?)(?!.*\d)/, Math.abs(parseFloat(lastNumber)));
+        } else {
+            // Jika jumlah klik ganjil, angka menjadi negatif
+            input = input.replace(/([-+*/]?\d+(\.\d+)?)(?!.*\d)/, -Math.abs(parseFloat(lastNumber)));
+        }
+        document.getElementById("tampil").value = input;
+        toggleCount++; // Update jumlah klik setiap kali fungsi dipanggil
+    } else {
+        // Jika tidak ada angka terakhir, tambahkan tanda negatif pada awal input
+        if (input !== '0') {
+            document.getElementById("tampil").value = '-' + input;
+            toggleCount = 1; // Set jumlah klik menjadi ganjil karena tanda negatif sudah ditambahkan
+        }
     }
 }
 
@@ -50,19 +68,7 @@ function persen() {
     document.getElementById("tampil").value = result;
 }
 
-function koma(){
-    let input = document.getElementById("tampil").value;
-    
-    let decimalExists = input.includes('.');
-
-    // Jika belum ada koma desimal, tambahkan satu
-    if (!decimalExists) {
-        document.getElementById("tampil").value += '.';
-    }
-}
-
-
-function resullt() {
+function result() {
     let input = document.getElementById("tampil").value;
 
     // Mengganti simbol kembali ke operator asli
@@ -72,11 +78,13 @@ function resullt() {
         // Evaluasi ekspresi matematika
         let result = eval(input);
 
+        // Memastikan hasil memiliki maksimal 5 angka desimal
+        let formattedResult = parseFloat(result.toFixed(5));
+
         // Menampilkan hasil
-        document.getElementById("tampil").value = result;
+        document.getElementById("tampil").value = formattedResult;
     } catch (error) {
         // Menangani kesalahan evaluasi
-        document.getElementById("tampil").value = 'Kesalahan';
+        document.getElementById("tampil").value = 'Error';
     }
 }
-
